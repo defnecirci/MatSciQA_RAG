@@ -1,9 +1,7 @@
 import pandas as pd
 import re  
 
-# Load the Excel file into a DataFrame
 df = pd.read_excel("all_questions_llama3_with_corresponding_values.xlsx")
-# Print the DataFrame with the new column
 #print(df['Corresponding Value'])
 
 def extract_corresponding_value(question, correct_answer):
@@ -12,7 +10,7 @@ def extract_corresponding_value(question, correct_answer):
     if match:
         extracted_value = match.group(1).strip()
         if correct_answer == 'D':
-            extracted_value = extracted_value[:-2]  # Exclude the last two characters
+            extracted_value = extracted_value[:-2]  # Exclude the last two characters ('})
         return extracted_value
     return None
 
@@ -40,7 +38,7 @@ def is_correct_prediction(row):
         elif str(predicted) == ground_truth:
             return True
 
-    # For MATCH category
+    # For other categories
     else:
         # First, check if the predicted answer matches the ground truth
         if str(predicted) == ground_truth:
@@ -74,7 +72,7 @@ incorrect_predictions = incorrect_predictions.reset_index(drop=True)
 incorrect_predictions.index += 1  # Start row numbering from 1
 incorrect_predictions.insert(0, 'Row', incorrect_predictions.index)
 
-# Print the DataFrame
+
 #print(incorrect_predictions[['Row', 'Question Info', 'Correct Answer', 'LLAMA3-8B', 'Question Type']].to_string(index=False))
 #print(incorrect_predictions[['Row', 'Question Info', 'Correct Answer',  'Question Type','Corresponding Value']].to_string(index=False))
 
@@ -96,7 +94,6 @@ def calculate_accuracy(df):
         total_questions += total
         print(f"{category}: {correct_predictions} / {total} (Accuracy: {accuracy:.2%})")
 
-    # Calculate accuracy for specific question types (NUM, MATCH, etc.)
     for question_type in df['Question Type'].unique():
         if question_type not in accuracies:
             accuracies[question_type] = 0
