@@ -19,9 +19,17 @@ def reader(filename: str):
         for j in lines:
                 # Pattern to find
                 if "{'answer':" in j:
-                        m=j.split(':')[1]
+                        m=j.strip().split(':')[-1]
+                        # m = j.strip()
                         exist = True
-    return m.split('}')[0] if exist else 'Could not find pattern'
+    return m.split('}')[0].split('[')[-1].split(']')[0] if exist else 'Could not find pattern'
+
+def reader_try(filename: str):
+     with open(filename, 'r', encoding="utf8") as file:
+          lines = file.readlines()
+          file.close()
+          if 'answer' in lines[-1]:
+               print(lines[-1])
 
 for idx, val in enumerate(df_aq['Question Info']):
     filename_ = val.lower().split('-')
@@ -29,18 +37,34 @@ for idx, val in enumerate(df_aq['Question Info']):
 
     exam, subject, year = filename_[0], filename_[1], filename_[2]
     question, question_type = filename_[3], df_aq['Question Type'][idx].lower()
-    
+
     if question_type == 'mcqs-num':
           question_type = 'mcqs'
     
-    filename = f"{exam}_{subject}_{year}/{model}_{question}_{question_type}.txt"
+    filename_format_1 = f"{exam}_{subject}_{year}/{model}_{question}_{question_type}.txt"
+
     
-    if path.exists(filedir+filename):
-        print(filename)
-        print(f"llama 3 answer = {reader(filedir+filename)} correct answer = {df_aq['Correct Answer'][idx]}")
+    print(path.exists(filedir+filename_format_1), filedir+filename_format_1)
+    if path.exists(filedir+filename_format_1):
+        # print(filename_format_1)
+        # print(reader(filedir+filename_format_1))
+        # print(f"llama 3 answer = {reader(filedir+filename_format_1)} correct answer = {df_aq['Correct Answer'][idx]}")
         llama3_all_questions.loc[idx] = [df_aq['Question Info'][idx], df_aq['Question Type'][idx],
                                          df_aq['Correct Answer'][idx], df_aq['GPT3.5'][idx],
                                          df_aq['GPT3.5-COT'][idx], df_aq['GPT4'][idx],
-                                         df_aq['GPT4-COT'][idx], reader(filedir+filename), df_aq['TOPIC'][idx]]
+                                         df_aq['GPT4-COT'][idx], reader(filedir+filename_format_1), df_aq['TOPIC'][idx]]
 
-llama3_all_questions.to_excel("all_questions_llama3.xlsx")
+    else:
+        # print(filename_)
+        question = filename_[4]
+        filename_format_2 = f"{exam}_{subject}_{year}/{model}_{question}_{question_type}.txt"
+        print(path.exists(filedir+filename_format_2), filedir+filename_format_2)
+        if path.exists(filedir+filename_format_2):
+            # print(filename_format_2)
+            # print(reader(filedir+filename_format_2))
+            # print(f"llama 3 answer = {reader(filedir+filename_format_2)} correct answer = {df_aq['Correct Answer'][idx]}")
+            llama3_all_questions.loc[idx] = [df_aq['Question Info'][idx], df_aq['Question Type'][idx],
+                                            df_aq['Correct Answer'][idx], df_aq['GPT3.5'][idx],
+                                            df_aq['GPT3.5-COT'][idx], df_aq['GPT4'][idx],
+                                            df_aq['GPT4-COT'][idx], reader(filedir+filename_format_2), df_aq['TOPIC'][idx]]
+llama3_all_questions.to_excel("all_questions_llama3_new.xlsx")
