@@ -1,2 +1,2 @@
 # MatSciQA_RAG
-RAG enhanced materials science question answering 
+Retrieval Augmented Generation (RAG) enhanced materials science question answering 
